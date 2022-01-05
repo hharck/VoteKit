@@ -41,7 +41,7 @@ public struct GenericValidator<voteType: VoteStub>: Validateable{
 
 
 extension GenericValidator{
-	public static var allValidators: [GenericValidator<voteType>] {[.everyoneHasVoted/*, .onlyVerifiedVotes*/, .noBlankVotes]}
+	public static var allValidators: [GenericValidator<voteType>] {[.everyoneHasVoted, .noBlankVotes]}
 	/// Will not validate any constitutent voting multiple times
 	internal static var oneVotePerUser: GenericValidator {
 		GenericValidator(id: "OneVotePerUser", name: "One vote per. user", offenseText: {"\($0.constituent.identifier) voted multiple times"}) { votes, _, _   in
@@ -65,20 +65,6 @@ extension GenericValidator{
 			return offenders
 		}
 	}
-	
-//	/// Will not validate if a constituent who is not on the allowed users list has voted
-//	public static var onlyVerifiedVotes: GenericValidator {
-//		GenericValidator(id: "onlyVerifiedVotes", name: "Only verified votes", offenseText: {"\($0.constituent.identifier) has voted even though they aren't on the list of verified users"}) { votes, constituents, _  in
-//
-//			return votes.compactMap { vote in
-//				if constituents.contains(vote.constituent){
-//					return nil
-//				} else {
-//					return vote
-//				}
-//			}
-//		}
-//	}
 	
 	/// All votes should be for atleast one of the options
 	public static var noBlankVotes: GenericValidator {
