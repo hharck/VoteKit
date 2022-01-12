@@ -1,23 +1,24 @@
 import Foundation
 
 public struct CSVConfiguration: Codable{
+    let name: String
     /* Elements containing the following will be replaced:
      - {constituentID} -> The identifier of the constituent on the given line
      */
-    var preValues: [String]
+    let preValues: [String]
     
-    var preHeaders: [String]
+    let preHeaders: [String]
     
     /* Elements containing the following will be replaced:
      - {option name} -> The option name
      Only valid with a single tag
      */
-    var optionHeader: String
+    let optionHeader: String
     
-    public var specialKeys: [String: String]
+    public let specialKeys: [String: String]
     
-    public init(preHeaders: [String], preValues: [String], optionHeader: String, specialKeys: [String: String] = [:]) throws{
-        
+    public init(name: String, preHeaders: [String], preValues: [String], optionHeader: String, specialKeys: [String: String] = [:]) throws{
+        self.name = name
         // Validates input
         guard preHeaders.count == preValues.count else {
             throw CSVConfigurationError.incompatiblePreHeaderAndValues
@@ -141,10 +142,10 @@ fileprivate enum CSVConfigurationError: String, Error{
 extension CSVConfiguration{
     //Format: https://github.com/vstenby/AlternativeVote/blob/main/KABSDemo.csv
     public static func SMKid() -> CSVConfiguration{
-        try! self.init(preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0"])
+        try! self.init(name: "SMKid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0"])
     }
     
     public static func defaultConfiguration() -> CSVConfiguration{
-        try! self.init(preHeaders: ["Constituent id"], preValues: ["{constituentID}"], optionHeader: "{option name}")
+        try! self.init(name: "Default", preHeaders: ["Constituent id"], preValues: ["{constituentID}"], optionHeader: "{option name}")
     }
 }
