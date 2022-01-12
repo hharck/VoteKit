@@ -37,6 +37,6 @@ public protocol VoteStub: Codable, Sendable, Hashable{
 	
 	var isBlank: Bool {get}
 	
-	static func fromCSVLine(values: [String], options: [VoteOption], constituent: Constituent) -> Self?
-	func csvValueFor(option: VoteOption) -> String
+    static func fromCSVLine(config: CSVConfiguration, values: [String], options: [VoteOption], constituent: Constituent) -> Self?
+    func csvValueFor(config: CSVConfiguration, option: VoteOption) -> String
 }

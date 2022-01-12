@@ -63,7 +63,7 @@ public actor SimpleMajority: SingleWinnerVote{
 
 
 extension SimpleMajority.SimpleMajorityVote{
-    public static func fromCSVLine(values: [String], options: [VoteOption], constituent: Constituent) -> SimpleMajority.SimpleMajorityVote? {
+    public static func fromCSVLine(config: CSVConfiguration, values: [String], options: [VoteOption], constituent: Constituent) -> SimpleMajority.SimpleMajorityVote? {
         guard values.count == options.count else {
             return nil
         }
@@ -93,7 +93,7 @@ extension SimpleMajority.SimpleMajorityVote{
         return self.init(constituent: constituent, preferredOption: option)
     }
     
-    public func csvValueFor(option: VoteOption) -> String {
+    public func csvValueFor(config: CSVConfiguration, option: VoteOption) -> String {
         if option == preferredOption {
             return "1"
         } else {

@@ -80,7 +80,7 @@ public actor yesNoVote: VoteProtocol{
 extension yesNoVote.yesNoVoteType{
     
     // Format: Tiestamp (legacy), user identifier, then "1" if yes for the given option, "0" if no for the given option, "" if no vote was cast for the given option
-    public static func fromCSVLine(values: [String], options: [VoteOption], constituent: Constituent) -> yesNoVote.yesNoVoteType? {
+    public static func fromCSVLine(config: CSVConfiguration, values: [String], options: [VoteOption], constituent: Constituent) -> yesNoVote.yesNoVoteType? {
         guard values.count == options.count else{
             return nil
         }
@@ -109,7 +109,7 @@ extension yesNoVote.yesNoVoteType{
         return self.init(constituent: constituent, values: values)
     }
     
-    public func csvValueFor(option: VoteOption) -> String {
+    public func csvValueFor(config: CSVConfiguration, option: VoteOption) -> String {
         if let val = values[option]{
             return val ? "1" : "0"
         } else{
