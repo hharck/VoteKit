@@ -43,7 +43,7 @@ extension VoteProtocol{
         }
         
         var errorFlag = false
-
+        
         // Finds the names of the options
         let optionHeaders = headerLine.dropFirst(config.preHeaders.count)
         let options = optionHeaders.compactMap { str -> VoteOption? in
@@ -54,7 +54,7 @@ extension VoteProtocol{
             }
             
             let optionName = str.dropFirst(parts.first!.count).dropLast(parts.last!.count)
-           
+            
             guard !optionName.isEmpty else {
                 errorFlag = true
                 return nil

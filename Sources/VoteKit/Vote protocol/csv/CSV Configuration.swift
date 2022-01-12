@@ -1,15 +1,15 @@
-import Foundation.NSRange
+import Foundation
 
 public struct CSVConfiguration: Codable{
     /* Elements containing the following will be replaced:
-      - {constituentID} -> The identifier of the constituent on the given line
+     - {constituentID} -> The identifier of the constituent on the given line
      */
     var preValues: [String]
     
     var preHeaders: [String]
     
     /* Elements containing the following will be replaced:
-      - {option name} -> The option name
+     - {option name} -> The option name
      Only valid with a single tag
      */
     var optionHeader: String
@@ -17,7 +17,7 @@ public struct CSVConfiguration: Codable{
     public var specialKeys: [String: String]
     
     public init(preHeaders: [String], preValues: [String], optionHeader: String, specialKeys: [String: String] = [:]) throws{
-    
+        
         // Validates input
         guard preHeaders.count == preValues.count else {
             throw CSVConfigurationError.incompatiblePreHeaderAndValues
@@ -76,13 +76,13 @@ public struct CSVConfiguration: Codable{
             .map{mStr in
                 mStr
                     .split(separator: "}", omittingEmptySubsequences: false)
-                    // Filters away tags
+                // Filters away tags
                     .filter{!tags.contains(String($0))}
                     .joined()
             }
             .map{String($0)}
     }
-
+    
     /// Validates an array of possible csv default values
     /// - Parameter values: The values to check
     /// - Returns: Whether all values are valid
@@ -124,8 +124,8 @@ public struct CSVConfiguration: Codable{
         guard leftCount >= minimumBrackets && (maximumBrackets == nil || leftCount <= maximumBrackets!) else {
             return false
         }
-                
-                
+        
+        
         return true
     }
 }
