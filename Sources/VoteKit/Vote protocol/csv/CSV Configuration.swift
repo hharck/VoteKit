@@ -1,7 +1,7 @@
 import Foundation
 
 public struct CSVConfiguration: Codable{
-    let name: String
+    public let name: String
     /* Elements containing the following will be replaced:
      - {constituentID} -> The identifier of the constituent on the given line
      */
