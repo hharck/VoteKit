@@ -40,7 +40,7 @@ public struct CSVConfiguration: Codable{
         // Checks special keys
         if let ceh = specialKeys["constituents-export header"]{
             guard
-                Self.isValid(values: ceh, minimumBrackets: 0, maximumBrackets: 0),
+                Self.isValid(values: ceh, allowsComma: false, minimumBrackets: 0, maximumBrackets: 0),
                 // "constituents-export header" must contain a single comma surrounded by other characters
                 let fIndex = ceh.firstIndex(of: ","),
                 let lIndex = ceh.lastIndex(of: ","),
@@ -115,13 +115,16 @@ public struct CSVConfiguration: Codable{
     ///   - minimumBrackets: The minimum number of brackets expected
     ///   - maximumBrackets: The maximum number of brackets expected
     /// - Returns: The validity of the value
-    private static func isValid(values: String, minimumBrackets: Int = 0, maximumBrackets: Int? = nil) -> Bool{
+    private static func isValid(values: String, allowsComma: Bool = false, minimumBrackets: Int = 0, maximumBrackets: Int? = nil) -> Bool{
         if values.isEmpty{
             return false
         }
         
         // Check for invalid characters
-        if values.contains(",") || values.contains(";") || values.contains("\n") || values.contains("\r") || values.contains("\t"){
+        if values.contains(";") || values.contains("\n") || values.contains("\r") || values.contains("\t"){
+            return false
+        }
+        if !allowsComma && values.contains(",") {
             return false
         }
         
