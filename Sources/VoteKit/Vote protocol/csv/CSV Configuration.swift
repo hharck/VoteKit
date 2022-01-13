@@ -40,7 +40,7 @@ public struct CSVConfiguration: Codable{
         // Checks special keys
         if let ceh = specialKeys["constituents-export header"]{
             guard
-                Self.isValid(values: ceh, allowsComma: false, minimumBrackets: 0, maximumBrackets: 0),
+                Self.isValid(values: ceh, allowsComma: true, minimumBrackets: 0, maximumBrackets: 0),
                 // "constituents-export header" must contain a single comma surrounded by other characters
                 let fIndex = ceh.firstIndex(of: ","),
                 let lIndex = ceh.lastIndex(of: ","),
