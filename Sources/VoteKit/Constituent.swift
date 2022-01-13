@@ -24,8 +24,14 @@ extension Constituent: ExpressibleByStringLiteral{
 extension Sequence where Element == Constituent{
     /// Creates a string representation of a CSV file containing the name and userid for all constituents
     /// - Returns: A string containing a CSV representation of the constituents
-    public func toCSV() -> String{
-        var csv = "Navn,Studienummer"
+    public func toCSV(config: CSVConfiguration) -> String{
+        var csv: String
+        if let title = config.specialKeys["constituents-export header"]{
+            csv = title
+        } else {
+            csv = "Name,Constituent identifier"
+        }
+        
         let voters = self.sorted { $0.identifier < $1.identifier}
         
         for voter in voters {

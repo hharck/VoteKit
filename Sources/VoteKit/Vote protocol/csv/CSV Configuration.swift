@@ -36,6 +36,21 @@ public struct CSVConfiguration: Codable{
             throw CSVConfigurationError.invalidOptionHeader
         }
         
+        
+        // Checks special keys
+        if let ceh = specialKeys["constituents-export header"]{
+            guard
+                Self.isValid(values: ceh, minimumBrackets: 0, maximumBrackets: 0),
+                // "constituents-export header" must contain a single comma surrounded by other characters
+                let fIndex = ceh.firstIndex(of: ","),
+                let lIndex = ceh.lastIndex(of: ","),
+                fIndex == lIndex && fIndex > ceh.startIndex && lIndex < ceh.endIndex
+            else {
+                throw CSVConfigurationError.invalidSpecialKey
+            }
+        }
+        
+        
         self.preHeaders = preHeaders
         self.preValues = preValues
         self.optionHeader = optionHeader
@@ -136,13 +151,14 @@ fileprivate enum CSVConfigurationError: String, Error{
     case invalidPreValues = "The pre values are invalid"
     case invalidOptionHeader = "The option header is invalid"
     case incompatiblePreHeaderAndValues = "The number of pre headers and pre values must be the same"
+    case invalidSpecialKey = "A special key is invalid"
 }
 
 // Default configurations
 extension CSVConfiguration{
     //Format: https://github.com/vstenby/AlternativeVote/blob/main/KABSDemo.csv
     public static func SMKid() -> CSVConfiguration{
-        try! self.init(name: "SMKid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0"])
+        try! self.init(name: "SMKid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0", "constituents-export header" : "Navn,Studienummer"])
     }
     
     public static func defaultConfiguration() -> CSVConfiguration{
