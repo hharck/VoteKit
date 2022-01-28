@@ -1,7 +1,7 @@
 import Foundation
 public protocol VoteProtocol: Actor{
-	associatedtype voteType: VoteStub
-	associatedtype particularValidator: Validateable
+	associatedtype voteType
+    associatedtype particularValidator: Validateable where particularValidator.voteType == Self.voteType
 	/// A unique identifier for the vote
 	var id: UUID {get}
 	
