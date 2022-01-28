@@ -24,7 +24,7 @@ extension VoteProtocol{
 
 }
 
-extension VoteProtocol where Self.particularValidator.voteType == Self.voteType{
+extension VoteProtocol{
 	public func validateParticularValidators() -> [VoteValidationResult] {
 		particularValidators.map{$0.validate(votes, constituents, options)}
 	}
