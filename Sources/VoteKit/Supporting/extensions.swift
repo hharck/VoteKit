@@ -18,4 +18,4 @@ extension Equatable where Self: AnyObject {
 	}
 }
 
-extension UUID: Sendable{}
+extension UUID: @unchecked Sendable{}
