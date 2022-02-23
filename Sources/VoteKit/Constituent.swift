@@ -7,9 +7,12 @@ public struct Constituent: Hashable, Codable, Sendable{
 	public var name: String?
 	public var identifier: ConstituentIdentifier
 	
-	public init(name: String? = nil, identifier: ConstituentIdentifier){
+	public var tag: String?
+	
+	public init(name: String? = nil, identifier: ConstituentIdentifier, tag: String? = nil){
 		self.name = name
 		self.identifier = identifier
+		self.tag = tag
 	}
 }
 

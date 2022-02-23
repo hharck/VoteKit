@@ -4,6 +4,7 @@ public struct CSVConfiguration: Codable, Sendable{
     public let name: String
     /* Elements containing the following will be replaced:
      - {constituentID} -> The identifier of the constituent on the given line
+	 - {constituentTag} -> The optional tag for the constituent
      */
     let preValues: [String]
     
@@ -65,6 +66,8 @@ public struct CSVConfiguration: Codable, Sendable{
         return self.preValues.map { str in
             if str == "{constituentID}"{
                 return constituent.identifier
+			} else if str == "{constituentTag}"{
+				return constituent.tag ?? ""
             } else {
                 return str
             }
@@ -96,7 +99,7 @@ public struct CSVConfiguration: Codable, Sendable{
                     .filter{!tags.contains(String($0))}
                     .joined()
             }
-            .map{String($0)}
+            .map(String.init(_:))
     }
     
     /// Validates an array of possible csv default values

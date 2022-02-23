@@ -69,7 +69,7 @@ extension GenericValidator{
 	/// All votes should be for atleast one of the options
 	public static var noBlankVotes: GenericValidator {
 		GenericValidator(id: "NoBlanks", name: "No blank votes", offenseText: {"\($0.constituent) voted blank"}) { votes, _,_  in
-			votes.filter {$0.isBlank}
+			votes.filter(\.isBlank)
 		}
 	}
 }

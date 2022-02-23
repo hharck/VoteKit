@@ -38,13 +38,7 @@ extension SimpleMajority{
 			}
 		}
 		
-		let winner = counted.compactMap { key, value -> VoteOption? in
-			if value == max{
-				return key
-			} else {
-				return nil
-			}
-		}
+        let winner = counted.filter{$0.value == max}.map(\.key)
 		
 		return WinnerWrapper(winner)
 	}

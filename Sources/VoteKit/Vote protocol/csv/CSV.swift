@@ -75,17 +75,24 @@ extension VoteProtocol{
                 return nil
             }
             
-            // Inly the first index of {constituentID} is required to find it
+            // Only the first index of {constituentID} is required to find it
             guard let constituentIndex = config.preValues.firstIndex(of: "{constituentID}") else {
                 errorFlag = true
                 return nil
             }
+			
+			var constituentTag: String? = nil
+			// Only the first index of {constituentID} is required to find it
+			if let tagIndex = config.preValues.firstIndex(of: "{constituentTag}") {
+				constituentTag = elements[tagIndex].trimmingCharacters(in: .whitespaces)
+			}
+			
             let constituentID = elements[constituentIndex].trimmingCharacters(in: .whitespaces)
             guard !constituentID.isEmpty else {
                 errorFlag = true
                 return nil
             }
-            let constituent = Constituent(name: nil, identifier: String(constituentID))
+            let constituent = Constituent(name: nil, identifier: String(constituentID), tag: constituentTag)
             let values = elements.dropFirst(config.preValues.count).map{$0.trimmingCharacters(in: .whitespaces)}
             return Self.voteType.fromCSVLine(config: config, values: values, options: options, constituent: constituent)
         }

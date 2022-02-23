@@ -127,9 +127,7 @@ extension VoteProtocol{
 		// If the constituent hasn't cast a vote it will be removed from the list of eligible voters in a vote
 		if !(self.votes.map(\.constituent.identifier).contains(constituent.identifier)){
 			//FIXME: Compiler workaround for "await self.constituents.remove(constituent)"
-			self.constituents = self.constituents.filter{ const in
-				const != constituent
-			}
+            self.constituents = self.constituents.filter{$0 != constituent}
 			return true
 		} else {
 			return false
