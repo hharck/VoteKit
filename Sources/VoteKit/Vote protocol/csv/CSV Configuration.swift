@@ -50,6 +50,18 @@ public struct CSVConfiguration: Codable, Sendable{
                 throw CSVConfigurationError.invalidSpecialKey
             }
         }
+		
+		if let showTags = specialKeys["constituents-export show-tags"]{
+			guard showTags == "1" || showTags.isEmpty || showTags == "0" else {
+				throw CSVConfigurationError.invalidSpecialKey
+			}
+			
+			// Unsupported combination
+			if showTags == "1" && specialKeys["constituents-export header"] != nil {
+				throw CSVConfigurationError.incompatibleSpecialKeyCombination
+			}
+		}
+
         
         
         self.preHeaders = preHeaders
@@ -158,6 +170,7 @@ fileprivate enum CSVConfigurationError: String, Error{
     case invalidOptionHeader = "The option header is invalid"
     case incompatiblePreHeaderAndValues = "The number of pre headers and pre values must be the same"
     case invalidSpecialKey = "A special key is invalid"
+	case incompatibleSpecialKeyCombination = "Incompatible special key combination"
 }
 
 // Default configurations

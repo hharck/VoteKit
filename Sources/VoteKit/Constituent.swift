@@ -29,19 +29,29 @@ extension Sequence where Element == Constituent{
     /// - Returns: A string containing a CSV representation of the constituents
     public func toCSV(config: CSVConfiguration) -> String{
         var csv: String
+		let showTags = config.specialKeys["constituents-export show-tags"] == "1"
+
         if let title = config.specialKeys["constituents-export header"]{
             csv = title
-        } else {
+		} else if showTags{
+			csv = "Name,Tag,Constituent identifier"
+		} else {
             csv = "Name,Constituent identifier"
         }
         
+		
         let voters = self.sorted { $0.identifier < $1.identifier}
         
         for voter in voters {
             csv += "\n"
             
             let name = voter.name ?? voter.identifier
-            csv += "\(name),\(voter.identifier)"
+			if showTags{
+				let tag = voter.tag ?? ""
+				csv += "\(name),\(tag),\(voter.identifier)"
+			} else {
+				csv += "\(name),\(voter.identifier)"
+			}
         }
         return csv
     }
