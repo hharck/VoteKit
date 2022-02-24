@@ -186,6 +186,6 @@ extension CSVConfiguration{
 	public static func defaultWithTags() -> CSVConfiguration{
 		let defaultConfig = Self.defaultConfiguration()
 		
-		return try! self.init(name: "Default with tags", preHeaders: defaultConfig.preHeaders, preValues: defaultConfig.preValues, optionHeader: defaultConfig.optionHeader, specialKeys: ["constituents-export show-tags":"1"])
+		return try! self.init(name: "Default with tags", preHeaders: defaultConfig.preHeaders + ["{constituentTag}"], preValues: defaultConfig.preValues, optionHeader: defaultConfig.optionHeader, specialKeys: ["constituents-export show-tags":"1"])
 	}
 }
