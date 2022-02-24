@@ -77,7 +77,7 @@ public struct CSVConfiguration: Codable, Sendable{
         return self.preValues.map { str in
             if str == "{constituentID}"{
                 return constituent.identifier
-			} else if str == "{constituentTag}"{
+			} else if str == "{constituentTag}" {
 				return constituent.tag ?? ""
             } else {
                 return str
@@ -182,4 +182,10 @@ extension CSVConfiguration{
     public static func defaultConfiguration() -> CSVConfiguration{
         try! self.init(name: "Default", preHeaders: ["Identifier"], preValues: ["{constituentID}"], optionHeader: "{option name}")
     }
+	
+	public static func defaultWithTags() -> CSVConfiguration{
+		let defaultConfig = Self.defaultConfiguration()
+		
+		return try! self.init(name: "Default with tags", preHeaders: defaultConfig.preHeaders, preValues: defaultConfig.preValues, optionHeader: defaultConfig.optionHeader, specialKeys: ["constituents-export show-tags":"1"])
+	}
 }
