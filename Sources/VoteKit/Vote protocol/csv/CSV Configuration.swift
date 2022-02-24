@@ -43,9 +43,8 @@ public struct CSVConfiguration: Codable, Sendable{
             guard
                 Self.isValid(values: ceh, allowsComma: true, minimumBrackets: 0, maximumBrackets: 0),
                 // "constituents-export header" must contain a single comma surrounded by other characters
-                let fIndex = ceh.firstIndex(of: ","),
-                let lIndex = ceh.lastIndex(of: ","),
-                fIndex == lIndex && fIndex > ceh.startIndex && lIndex < ceh.endIndex
+                let index = ceh.firstIndex(of: ","),
+				index == ceh.lastIndex(of: ",") && index > ceh.startIndex && index < ceh.endIndex
             else {
                 throw CSVConfigurationError.invalidSpecialKey
             }
@@ -181,6 +180,6 @@ extension CSVConfiguration{
     }
     
     public static func defaultConfiguration() -> CSVConfiguration{
-        try! self.init(name: "Default", preHeaders: ["Constituent id"], preValues: ["{constituentID}"], optionHeader: "{option name}")
+        try! self.init(name: "Default", preHeaders: ["Identifier"], preValues: ["{constituentID}"], optionHeader: "{option name}")
     }
 }
