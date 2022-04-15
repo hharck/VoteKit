@@ -5,12 +5,11 @@ public struct VoteOption: Sendable, Hashable, Equatable, Codable{
 	public let id: UUID
 	public var name: String
 	public var subTitle: String?
-	public var customData: [String: String]
+	public var customData: [String: String] = [:]
 	
 	public init(_ name: String, subTitle: String? = nil, customData: [String: String]? = nil){
 		self.name = name
 		self.subTitle = subTitle
-		self.customData = customData ?? [:]
 		self.id = UUID()
 	}
 }

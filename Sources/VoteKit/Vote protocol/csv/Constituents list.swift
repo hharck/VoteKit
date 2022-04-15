@@ -16,17 +16,17 @@ extension Sequence where Element == Constituent{
 		}
 		
 		
-		let voters = self.sorted { $0.identifier < $1.identifier}
+		let constituents = self.sorted { $0.identifier < $1.identifier}
 		
-		for voter in voters {
+		for constituent in constituents {
 			csv += "\n"
 			
-			let name = voter.name ?? voter.identifier
+			let name = constituent.getNameOrId()
 			if showTags{
-				let tag = voter.tag ?? ""
-				csv += "\(name),\(voter.identifier),\(tag)"
+				let tag = constituent.tag ?? ""
+				csv += "\(name),\(constituent.identifier),\(tag)"
 			} else {
-				csv += "\(name),\(voter.identifier)"
+				csv += "\(name),\(constituent.identifier)"
 			}
 		}
 		return csv

@@ -17,7 +17,7 @@ public struct Constituent: Hashable, Codable, Sendable{
 	
 	/// Retrieves a screen name for the user, primarily the name proporty, if it is nil its identifier will be used
 	public func getNameOrId() -> String {
-		return name ?? identifier
+		return self.name ?? self.identifier
 	}
 }
 
