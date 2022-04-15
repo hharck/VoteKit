@@ -14,6 +14,11 @@ public struct Constituent: Hashable, Codable, Sendable{
 		self.identifier = identifier
 		self.tag = tag
 	}
+	
+	/// Retrieves a screen name for the user, primarily the name proporty, if it is nil its identifier will be used
+	public func getNameOrId() -> String {
+		return name ?? identifier
+	}
 }
 
 // Primarily used for simply creating a constituent in tests
