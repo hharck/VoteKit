@@ -8,11 +8,13 @@ public struct Constituent: Hashable, Codable, Sendable{
 	public var identifier: ConstituentIdentifier
 	
 	public var tag: String?
+	public var email: String?
 	
-	public init(name: String? = nil, identifier: ConstituentIdentifier, tag: String? = nil){
+	public init(name: String? = nil, identifier: ConstituentIdentifier, tag: String? = nil, email: String? = nil){
 		self.name = name
 		self.identifier = identifier
 		self.tag = tag
+		self.email = email
 	}
 	
 	/// Retrieves a screen name for the user, primarily the name proporty, if it is nil its identifier will be used

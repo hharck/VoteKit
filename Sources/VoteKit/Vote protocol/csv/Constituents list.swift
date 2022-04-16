@@ -53,12 +53,22 @@ public func constituentsListFromCSV(file: String, config: CSVConfiguration? = ni
 	
 	// Verifies header is present
 	let hasTags: Bool
-	if header == "Name,Identifier,Tag"{
+	let hasEmail: Bool
+	if header == "Name,Identifier,Tag" {
 		hasTags = true
-	} else if header == "Name,Identifier" {
+		hasEmail = false
+	} else if header == "Name,Identifier,Tag,Email"{
+		hasTags = true
+		hasEmail = true
+	} else if header == "Name,Identifier"{
 		hasTags = false
+		hasEmail = false
+	} else if header == "Name,Identifier,Email"{
+		hasTags = false
+		hasEmail = true
 	} else if config?.specialKeys["constituents-export header"] != nil && header == config!.specialKeys["constituents-export header"]!{
 		hasTags = false
+		hasEmail = false
 	} else {
 		throw DecodeConstituentError.invalidCSV
 	}
@@ -76,6 +86,7 @@ public func constituentsListFromCSV(file: String, config: CSVConfiguration? = ni
 		let rawIdentifier = String(s[1]).trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 		
 		let tag: String?
+		let email: String?
 		if hasTags{
 			let rawTag = String(s[2]).trimmingCharacters(in: .whitespacesAndNewlines)
 			
@@ -88,22 +99,36 @@ public func constituentsListFromCSV(file: String, config: CSVConfiguration? = ni
 			tag = nil
 		}
 		
-		if rawIdentifier.isEmpty{
+		if hasEmail{
+			let index = 2 + (hasTags ? 1 : 0)
+			
+			let rawEmail = String(s[index]).trimmingCharacters(in: .whitespacesAndNewlines)
+			
+			// To enable sorting of external and internal tags
+			guard (rawEmail.isEmpty || rawEmail.count >= 5) && rawEmail.count <= maxNameLength else {
+				throw DecodeConstituentError.invalidEmail
+			}
+			email = rawEmail.isEmpty ? nil : rawEmail
+		} else {
+			email = nil
+		}
+		
+		if rawIdentifier.isEmpty, rawIdentifier.count <= maxNameLength{
 			throw DecodeConstituentError.invalidIdentifier
 		}
 		
-		guard rawIdentifier.count <= maxNameLength, rawName.count <= maxNameLength else {
+		guard rawName.count <= maxNameLength else {
 			throw DecodeConstituentError.nameTooLong
 		}
 		
 		let identifier: String = rawIdentifier
 		let name: String? = (rawName.isEmpty || rawName == rawIdentifier) ? nil : rawName
 		
-		return Constituent(name: name, identifier: identifier, tag: tag)
+		return Constituent(name: name, identifier: identifier, tag: tag, email: email)
 		
 	}
 }
 
 public enum DecodeConstituentError: Error{
-	case invalidIdentifier, nameTooLong, invalidCSV, invalidTag
+	case invalidIdentifier, nameTooLong, invalidCSV, invalidTag, invalidEmail
 }
