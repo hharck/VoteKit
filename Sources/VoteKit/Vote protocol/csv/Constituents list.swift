@@ -78,7 +78,8 @@ public func constituentsListFromCSV(file: String, config: CSVConfiguration? = ni
 	
 	return try individualConstituentLines.map{ row -> Constituent in
 		let s = row.split(separator:",", omittingEmptySubsequences: false)
-		guard hasTags && s.count == 3 || !hasTags && s.count == 2 else {
+		let expectedLength = 2 + (hasTags ? 1 : 0) + (hasEmail ? 1 : 0)
+		guard s.count == expectedLength else {
 			throw DecodeConstituentError.invalidCSV
 		}
 		
