@@ -176,7 +176,7 @@ fileprivate enum CSVConfigurationError: String, Error{
 extension CSVConfiguration{
     //Format: https://github.com/vstenby/AlternativeVote/blob/main/KABSDemo.csv
     public static func SMKid() -> CSVConfiguration{
-		try! self.init(name: "S/M-Kid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0", "constituents-export header" : "Navn,Studienummer", "constituents-export hide-names" : "1"])
+		try! self.init(name: "S/M-Kid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0", "constituents-export header" : "Studienummer", "constituents-export hide-names" : "1"])
     }
     
     public static func defaultConfiguration() -> CSVConfiguration{
