@@ -40,14 +40,17 @@ public struct CSVConfiguration: Codable, Sendable{
         
         // Checks special keys
         if let ceh = specialKeys["constituents-export header"]{
-            guard
-                Self.isValid(values: ceh, allowsComma: true, minimumBrackets: 0, maximumBrackets: 0),
-                // "constituents-export header" must contain a single comma surrounded by other characters
-                let index = ceh.firstIndex(of: ","),
-				index == ceh.lastIndex(of: ",") && index > ceh.startIndex && index < ceh.endIndex
-            else {
+            guard Self.isValid(values: ceh, allowsComma: true, minimumBrackets: 0, maximumBrackets: 0) else {
                 throw CSVConfigurationError.invalidSpecialKey
             }
+			
+			// "constituents-export header" must either contain a single comma surrounded by other (at least one) characters or no commas at all if "constituents-export hide-names" is true
+			let index = ceh.firstIndex(of: ",")
+			if specialKeys["constituents-export hide-names"] == "1" {
+				guard index == nil else { throw CSVConfigurationError.invalidSpecialKey }
+			} else if let index = index {
+				guard index == ceh.lastIndex(of: ",") && index > ceh.startIndex && index < ceh.endIndex else { throw CSVConfigurationError.invalidSpecialKey }
+			} else { throw CSVConfigurationError.invalidSpecialKey }
         }
 		
 		if let showTags = specialKeys["constituents-export show-tags"]{
