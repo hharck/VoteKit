@@ -4,17 +4,17 @@ extension Sequence where Element == Constituent{
 	/// Creates a string representation of a CSV file containing the name and userid for all constituents
 	/// - Returns: A string containing a CSV representation of the constituents
 	public func toCSV(config: CSVConfiguration) -> String{
-		var csv: String
+		var csv: String = ""
 		let showTags = config.specialKeys["constituents-export show-tags"] == "1"
+		let showNames = config.specialKeys["constituents-export hide-names"] != "1"
 		
 		if let header = config.specialKeys["constituents-export header"]{
 			csv = header
-		} else if showTags{
-			csv = "Name,Identifier,Tag"
 		} else {
-			csv = "Name,Identifier"
+			if showNames { csv += "Name," }
+			csv += "Identifier"
+			if showTags { csv += ",Tag" }
 		}
-		
 		
 		let constituents = self.sorted { $0.identifier < $1.identifier}
 		
@@ -22,11 +22,12 @@ extension Sequence where Element == Constituent{
 			csv += "\n"
 			
 			let name = constituent.getNameOrId()
+			
+			if showNames { csv += "\(name)," }
+			csv += "\(constituent.identifier)"
 			if showTags{
 				let tag = constituent.tag ?? ""
-				csv += "\(name),\(constituent.identifier),\(tag)"
-			} else {
-				csv += "\(name),\(constituent.identifier)"
+				csv += ",\(tag)"
 			}
 		}
 		return csv
