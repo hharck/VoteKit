@@ -176,7 +176,7 @@ fileprivate enum CSVConfigurationError: String, Error{
 extension CSVConfiguration{
     //Format: https://github.com/vstenby/AlternativeVote/blob/main/KABSDemo.csv
     public static func SMKid() -> CSVConfiguration{
-        try! self.init(name: "SMKid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0", "constituents-export header" : "Navn,Studienummer"])
+		try! self.init(name: "S/M-Kid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0", "constituents-export header" : "Navn,Studienummer", "constituents-export hide-names" : "1"])
     }
     
     public static func defaultConfiguration() -> CSVConfiguration{
@@ -185,7 +185,17 @@ extension CSVConfiguration{
 	
 	public static func defaultWithTags() -> CSVConfiguration{
 		let defaultConfig = Self.defaultConfiguration()
+		var specialKeys = defaultConfig.specialKeys
+		specialKeys["constituents-export show-tags"] = "1"
 		
-		return try! self.init(name: "Default with tags", preHeaders: defaultConfig.preHeaders + ["Tag"], preValues: defaultConfig.preValues  + ["{constituentTag}"], optionHeader: defaultConfig.optionHeader, specialKeys: ["constituents-export show-tags":"1"])
+		return try! self.init(name: "Default with tags", preHeaders: defaultConfig.preHeaders + ["Tag"], preValues: defaultConfig.preValues  + ["{constituentTag}"], optionHeader: defaultConfig.optionHeader, specialKeys: specialKeys)
 	}
+	
+	public static func onlyIds() -> CSVConfiguration{
+		let defaultConfig = defaultConfiguration()
+		var specialKeys = defaultConfig.specialKeys
+		specialKeys["constituents-export hide-names"] = "1"
+		
+		return try! self.init(name: "Only ids", preHeaders: defaultConfig.preHeaders, preValues: defaultConfig.preValues, optionHeader: defaultConfig.optionHeader, specialKeys: specialKeys)
+   }
 }
