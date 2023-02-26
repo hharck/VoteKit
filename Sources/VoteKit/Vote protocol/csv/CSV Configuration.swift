@@ -1,6 +1,26 @@
 import Foundation
 
 public struct CSVConfiguration: Codable, Sendable{
+    public struct SpecialKeys: Hashable, Codable, Sendable {
+        public init(constituentsExportHeader: String? = nil, constituentsExportHideNames: Bool = false, constituentsExportHideEmails: Bool = false, constituentsExportShowTags: Bool = false, extraBools: [String : Bool] = [:], extraStrings: [String : String] = [:]) {
+            self.constituentsExportHeader = constituentsExportHeader
+            self.constituentsExportHideNames = constituentsExportHideNames
+            self.constituentsExportHideEmails = constituentsExportHideEmails
+            self.constituentsExportShowTags = constituentsExportShowTags
+            self.extraBools = extraBools
+            self.extraStrings = extraStrings
+        }
+
+        public static var empty: Self {self.init()}
+
+        public var constituentsExportHeader: String?
+        public var constituentsExportHideNames: Bool = false
+        public var constituentsExportHideEmails: Bool = false
+        public var constituentsExportShowTags: Bool = false
+        public var extraBools: [String: Bool] = [:]
+        public var extraStrings: [String: String] = [:]
+    }
+
     public let name: String
     /* Elements containing the following will be replaced:
      - {constituentID} -> The identifier of the constituent on the given line
@@ -16,9 +36,9 @@ public struct CSVConfiguration: Codable, Sendable{
      */
     let optionHeader: String
     
-    public let specialKeys: [String: String]
+    public let specialKeys: SpecialKeys
     
-    public init(name: String, preHeaders: [String], preValues: [String], optionHeader: String, specialKeys: [String: String] = [:]) throws{
+    public init(name: String, preHeaders: [String], preValues: [String], optionHeader: String, specialKeys: SpecialKeys = .empty) throws{
         self.name = name
         // Validates input
         guard preHeaders.count == preValues.count else {
@@ -37,41 +57,39 @@ public struct CSVConfiguration: Codable, Sendable{
             throw CSVConfigurationError.invalidOptionHeader
         }
         
-        
         // Checks special keys
-        if let ceh = specialKeys["constituents-export header"]{
+        if let ceh = specialKeys.constituentsExportHeader{
             guard Self.isValid(values: ceh, allowsComma: true, minimumBrackets: 0, maximumBrackets: 0) else {
                 throw CSVConfigurationError.invalidSpecialKey
             }
 			
 			// "constituents-export header" must either contain a single comma surrounded by other (at least one) characters or no commas at all if "constituents-export hide-names" is true
-			let index = ceh.firstIndex(of: ",")
-			if specialKeys["constituents-export hide-names"] == "1" {
-				guard index == nil else { throw CSVConfigurationError.invalidSpecialKey }
-			} else if let index = index {
-				guard index == ceh.lastIndex(of: ",") && index > ceh.startIndex && index < ceh.endIndex else { throw CSVConfigurationError.invalidSpecialKey }
-			} else { throw CSVConfigurationError.invalidSpecialKey }
-        }
-		
-		if let showTags = specialKeys["constituents-export show-tags"]{
-			guard showTags == "1" || showTags.isEmpty || showTags == "0" else {
-				throw CSVConfigurationError.invalidSpecialKey
-			}
-			
-			// Unsupported combination
-			if showTags == "1" && specialKeys["constituents-export header"] != nil {
-				throw CSVConfigurationError.incompatibleSpecialKeyCombination
-			}
-		}
+			let firstCommaIndex = ceh.firstIndex(of: ",")
 
-        
+            let expectedCommaCount = (specialKeys.constituentsExportHideNames ? 0 : 1) + (specialKeys.constituentsExportHideEmails ? 0 : 1) + (specialKeys.constituentsExportShowTags ? 1 : 0)
+            if expectedCommaCount == 0 {
+                guard firstCommaIndex == nil else { throw CSVConfigurationError.invalidSpecialKey }
+            } else if let firstCommaIndex = firstCommaIndex {
+                // The correct number of fields and the commas should not be in the end of the string
+                guard let lastCommaIndex = ceh.lastIndex(of: ","),
+                      expectedCommaCount == ceh.filter({$0 == ","}).count,
+                      firstCommaIndex > ceh.startIndex && lastCommaIndex < ceh.endIndex else {
+                    throw CSVConfigurationError.invalidSpecialKey
+
+                }
+            } else { throw CSVConfigurationError.invalidSpecialKey }
+        }
+
+        // Unsupported combination
+        if specialKeys.constituentsExportShowTags && specialKeys.constituentsExportHeader != nil {
+            throw CSVConfigurationError.incompatibleSpecialKeyCombination
+        }
         
         self.preHeaders = preHeaders
         self.preValues = preValues
         self.optionHeader = optionHeader
         self.specialKeys = specialKeys
     }
-    
     
     /// Converts the preValues into parts of a CSV line
     /// - Parameter constituent: The constituents being represented on the line
@@ -124,8 +142,7 @@ public struct CSVConfiguration: Codable, Sendable{
             !isValid(values: $0)
         }
     }
-    
-    
+
     /// Validates a default value for CSV
     /// - Parameters:
     ///   - values: The value to check
@@ -161,7 +178,6 @@ public struct CSVConfiguration: Codable, Sendable{
             return false
         }
         
-        
         return true
     }
 }
@@ -177,9 +193,10 @@ fileprivate enum CSVConfigurationError: String, Error{
 
 // Default configurations
 extension CSVConfiguration{
+    static let defaultConfig = Self.defaultConfiguration()
     //Format: https://github.com/vstenby/AlternativeVote/blob/main/KABSDemo.csv
-    public static func SMKid() -> CSVConfiguration{
-		try! self.init(name: "S/M-Kid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: ["Alternative vote priority suffix" : ".0", "constituents-export header" : "Studienummer", "constituents-export hide-names" : "1"])
+    public static func SMKid() -> CSVConfiguration {
+        try! self.init(name: "S/M-Kid", preHeaders: ["Tidsstempel", "Studienummer"], preValues: ["01/01/2001 00.00.01", "{constituentID}"], optionHeader: "Stemmeseddel [{option name}]", specialKeys: SpecialKeys(constituentsExportHeader: "Studienummer", constituentsExportHideNames: true, constituentsExportHideEmails: true, extraStrings: ["Alternative vote priority suffix": ".0"]))
     }
     
     public static func defaultConfiguration() -> CSVConfiguration{
@@ -187,18 +204,10 @@ extension CSVConfiguration{
     }
 	
 	public static func defaultWithTags() -> CSVConfiguration{
-		let defaultConfig = Self.defaultConfiguration()
-		var specialKeys = defaultConfig.specialKeys
-		specialKeys["constituents-export show-tags"] = "1"
-		
-		return try! self.init(name: "Default with tags", preHeaders: defaultConfig.preHeaders + ["Tag"], preValues: defaultConfig.preValues  + ["{constituentTag}"], optionHeader: defaultConfig.optionHeader, specialKeys: specialKeys)
+		try! self.init(name: "Default with tags", preHeaders: defaultConfig.preHeaders + ["Tag"], preValues: defaultConfig.preValues  + ["{constituentTag}"], optionHeader: defaultConfig.optionHeader, specialKeys: SpecialKeys(constituentsExportShowTags: true))
 	}
 	
 	public static func onlyIds() -> CSVConfiguration{
-		let defaultConfig = defaultConfiguration()
-		var specialKeys = defaultConfig.specialKeys
-		specialKeys["constituents-export hide-names"] = "1"
-		
-		return try! self.init(name: "Only ids", preHeaders: defaultConfig.preHeaders, preValues: defaultConfig.preValues, optionHeader: defaultConfig.optionHeader, specialKeys: specialKeys)
+		try! self.init(name: "Only ids", preHeaders: defaultConfig.preHeaders, preValues: defaultConfig.preValues, optionHeader: defaultConfig.optionHeader, specialKeys: SpecialKeys(constituentsExportHideNames: true))
    }
 }
