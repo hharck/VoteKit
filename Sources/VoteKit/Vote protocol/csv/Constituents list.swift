@@ -125,9 +125,6 @@ public func constituentDataListFromCSV(file: String, config: CSVConfiguration? =
         do {
             let split = header.split(separator: ",").map(String.init)
             let headerValues = split.compactMap(HeaderValues.init)
-            guard headerValues.contains(.name), headerValues.contains(.identifier) else {
-                throw DecodeConstituentError.invalidCSV
-            }
             guard split.count == headerValues.count else {
                 throw DecodeConstituentError.invalidCSV
             }
