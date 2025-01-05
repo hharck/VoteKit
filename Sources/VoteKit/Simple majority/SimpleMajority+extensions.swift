@@ -1,7 +1,6 @@
-
 extension SimpleMajority{
 	func resetVoteForUser(_ id: ConstituentIdentifier) {
-		votes.removeAll{$0.constituent.identifier == id}
+		votes.removeAll{ $0.constituent.identifier == id }
 	}
 	
     public func count(force: Bool) async throws -> [VoteOption : UInt] {
@@ -12,34 +11,28 @@ extension SimpleMajority{
         
         
 		// Sets all to zero votes
-		var result: [VoteOption: UInt] = options.reduce(into:  [VoteOption: UInt]()) { partialResult, option in
+		let result: [VoteOption: UInt] = options.reduce(into: [VoteOption: UInt]()) { partialResult, option in
 			partialResult[option] = 0
 		}
-		for vote in votes{
-			if vote.preferredOption == nil {
-				continue
-			}
-			
-			result[vote.preferredOption!]? += 1
-		}
-		
-		return result
+        return try votes.compactMap(\.preferredOption)
+            .reduce(into: result) { partialResult, option in
+                guard partialResult.keys.contains(option) else {
+                    throw SimpleValidationErrors.nonExistingOption
+                }
+                partialResult[option]? += 1
+            }
 	}
 }
 
-extension SimpleMajority{
+enum SimpleValidationErrors: String, Error {
+    case nonExistingOption = "Tried to count non-existing option"
+}
+
+extension SimpleMajority {
 	public func findWinner(force: Bool, excluding: Set<VoteOption>) async throws -> WinnerWrapper {
 		let counted = try await self.count(force: force)
-		
-		var max: UInt = 0
-		counted.forEach{ option in
-			if option.value > max{
-				max = option.value
-			}
-		}
-		
-        let winner = counted.filter{$0.value == max}.map(\.key)
-		
+        let highestCount = counted.values.max()
+        let winner = counted.filter{ $0.value == highestCount }.map(\.key)
 		return WinnerWrapper(winner)
 	}
 }
