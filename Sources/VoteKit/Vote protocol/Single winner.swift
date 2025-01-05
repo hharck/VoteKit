@@ -9,7 +9,6 @@ extension SingleWinnerVote{
 	}
 }
 
-
 public enum WinnerWrapper: Sendable{
 	case singleWinner(winner: VoteOption)
 	case tie(winners: Set<VoteOption>)
