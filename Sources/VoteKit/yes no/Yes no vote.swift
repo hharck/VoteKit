@@ -1,17 +1,17 @@
 import Foundation
-public actor yesNoVote: VoteProtocol{
+public actor YesNoVote: VoteProtocol{
     public var id: UUID
     public var name: String
     public var options: [VoteOption]
     public var constituents: Set<Constituent>
-    public var votes: [yesNoVoteType]
-    public var genericValidators: [GenericValidator<yesNoVoteType>] = []
-    public var particularValidators: [yesNoValidators] = []
+    public var votes: [YesNoVoteType]
+    public var genericValidators: [GenericValidator<YesNoVoteType>] = []
+    public var particularValidators: [YesNoValidators] = []
     public var customData: [String : String] = [:]
     public static let typeName: String = "Yes-no"
     
     
-    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [yesNoVoteType] = [], genericValidators: [GenericValidator<yesNoVoteType>] = [], particularValidators: [yesNoValidators] = [], customData: [String : String] = [:]){
+    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType] = [], genericValidators: [GenericValidator<YesNoVoteType>] = [], particularValidators: [YesNoValidators] = [], customData: [String : String] = [:]){
         self.id = id
         self.name = name
         self.options = options
@@ -22,7 +22,7 @@ public actor yesNoVote: VoteProtocol{
         self.customData = customData
     }
     
-    public init(options: [VoteOption], constituents: Set<Constituent>, votes: [yesNoVoteType]) {
+    public init(options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType]) {
         self.votes = votes
         self.options = options
         self.constituents = constituents
@@ -32,7 +32,7 @@ public actor yesNoVote: VoteProtocol{
         self.genericValidators = []
     }
     
-    public struct yesNoVoteType: VoteStub{
+    public struct YesNoVoteType: VoteStub{
         public var constituent: Constituent
         public var values: [VoteOption: Bool]
         
@@ -77,10 +77,10 @@ public actor yesNoVote: VoteProtocol{
 }
 
 //CSV
-extension yesNoVote.yesNoVoteType{
+extension YesNoVote.YesNoVoteType{
     
-    // Format: Tiestamp (legacy), user identifier, then "1" if yes for the given option, "0" if no for the given option, "" if no vote was cast for the given option
-    public static func fromCSVLine(config: CSVConfiguration, values: [String], options: [VoteOption], constituent: Constituent) -> yesNoVote.yesNoVoteType? {
+    // Format: Timestamp (legacy), user identifier, then "1" if yes for the given option, "0" if no for the given option, "" if no vote was cast for the given option
+    public static func fromCSVLine(config: CSVConfiguration, values: [String], options: [VoteOption], constituent: Constituent) -> YesNoVote.YesNoVoteType? {
         guard values.count == options.count else{
             return nil
         }

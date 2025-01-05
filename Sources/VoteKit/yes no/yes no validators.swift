@@ -1,9 +1,9 @@
-public enum yesNoValidators: String, Codable, CaseIterable{
+public enum YesNoValidators: String, Codable, CaseIterable{
 	case preferenceForAllRequired
 }
 
-extension yesNoValidators: Validateable{
-	public func validate(_ votes: [yesNoVote.yesNoVoteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult {
+extension YesNoValidators: Validateable{
+	public func validate(_ votes: [YesNoVote.YesNoVoteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult {
 		switch self {
 		case .preferenceForAllRequired:
 			return validatePreferenceForAllRequired(votes, constituents, allOptions)
@@ -11,7 +11,7 @@ extension yesNoValidators: Validateable{
 	}
 	
 	
-	public func validatePreferenceForAllRequired(_ votes: [yesNoVote.yesNoVoteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult {
+	public func validatePreferenceForAllRequired(_ votes: [YesNoVote.YesNoVoteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult {
 		let errors = votes.filter{ vote in
 			// Checks for unexpected values and stops execution on debug builds
 			assert(allOptions.count >= vote.values.count, "Constituent has voted for more options than those available\nVoted for: \(vote.values.keys.map(\.name))\nAvailable: \(allOptions.map(\.name))")

@@ -6,32 +6,19 @@ public struct VoteValidationResult: Codable, Hashable {
 	/// The name of the validator responsible for giving this set of errors
 	public let name: String
 	
-	/// The errors found doing validation of a single validationrule
+	/// The errors found during validation of a single validation rule
 	public let errors: [String]
 	
 }
 
-// Turns ValidationResult into a Sequence
-extension VoteValidationResult: Sequence{
-	public func makeIterator() -> IndexingIterator<[String]>{
-		return self.errors.makeIterator()
-	}
-	
-	public func count() -> Int {
-		return self.errors.count
-	}
-}
-
-extension Array where Element == VoteValidationResult{
-	//Sums the number of errors
-	public var countErrors: Int{
-		self.map{$0.count()}.reduce(0, +)
+extension Array where Element == VoteValidationResult {
+	public var hasErrors: Bool {
+        contains { !$0.errors.isEmpty }
 	}
 }
 
 // Makes it possible to throw an array of Validation results
-extension VoteValidationResult: Sendable{}
-extension Array: Error where Element == VoteValidationResult{}
+extension VoteValidationResult: Sendable {}
 func + (lhs: [VoteValidationResult], rhs: VoteValidationResult) -> [VoteValidationResult]{
 	lhs + [rhs]
 }

@@ -1,5 +1,19 @@
 import Foundation
-public actor SimpleMajority: SingleWinnerVote{
+public actor SimpleMajority: SingleWinnerVote {
+    public typealias particularValidator = SimpleMajorityValidators
+    
+    public enum SimpleMajorityValidators: CaseIterable, Validateable {
+        public func validate(_ votes: [SimpleMajority.SimpleMajorityVote], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult {
+            fatalError()
+        }
+        
+        public typealias VoteType = SimpleMajorityVote
+        
+        public var id: String { "" }
+        
+        public var name: String { "" }
+    }
+    
     public var id: UUID
     public var name: String
     public var options: [VoteOption]
@@ -46,18 +60,6 @@ public actor SimpleMajority: SingleWinnerVote{
 			self.constituent = constituent
 			self.preferredOption = preferredOption
 		}
-	}
-	
-	public struct SimpleMajorityValidators: Validateable{
-		public func validate(_ votes: [SimpleMajority.voteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult {
-			fatalError("Not implemented")
-		}
-		
-		public var id: String = ""
-		
-		public var name: String = ""
-		
-		public static var allValidators: [SimpleMajority.SimpleMajorityValidators] = []
 	}
 }
 

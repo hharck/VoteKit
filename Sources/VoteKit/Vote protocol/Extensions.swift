@@ -9,30 +9,34 @@ extension VoteProtocol{
 				validator.validate(votes, constituents, options)
 			}
 		+ self.validateParticularValidators()
-		+ GenericValidator<voteType>.oneVotePerUser.validate(votes, constituents, options)
+		+ GenericValidator<VoteType>.oneVotePerUser.validate(votes, constituents, options)
 		
     }
     
-    public func validateThrowing() throws{
-        let validationResults = self.validate()
+    public func validateThrowing() throws {
+        let validationResults = validate()
         
         // If any validation has en error, throw it
-        guard validationResults.countErrors == 0 else {
-            throw validationResults
+        guard validationResults.hasErrors else {
+            throw ValidationErrors(error: validationResults)
         }
     }
 
 }
 
+struct ValidationErrors: Error {
+    var error: [VoteValidationResult]
+}
+
 extension VoteProtocol{
 	public func validateParticularValidators() -> [VoteValidationResult] {
-		particularValidators.map{$0.validate(votes, constituents, options)}
+		particularValidators.map{ $0.validate(votes, constituents, options) }
 	}
 }
 
 
 //MARK: Getters
-extension VoteProtocol{
+extension VoteProtocol {
 	/// Retrieves customData for the given key
 	public func getData(key: String) async -> Codable?{
 		self.customData[key]
@@ -94,7 +98,7 @@ extension VoteProtocol{
 	/// Sets the votes property, overriding any existing information
 	/// - Parameter votes: The votes to set
 	/// - Returns: Whether all userIDs were unique
-	@discardableResult public func setVotes(_ votes: [voteType]) async -> Bool{
+	@discardableResult public func setVotes(_ votes: [VoteType]) async -> Bool{
 		guard votes.map(\.constituent.identifier).nonUniques().isEmpty else {
 			return false
 		}
@@ -106,7 +110,7 @@ extension VoteProtocol{
 	/// Adds a vote to the list of votes
 	/// - Parameter vote: The vote to set
 	/// - Returns: Whether all constituents were unique
-	@discardableResult public func addVote(_ vote: voteType) -> Bool{
+	@discardableResult public func addVote(_ vote: VoteType) -> Bool{
 		if hasConstituentVoted(vote.constituent){
 			return false
 		}

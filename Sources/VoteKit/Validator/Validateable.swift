@@ -1,6 +1,6 @@
 public protocol Validateable: Sendable, Equatable{
-	associatedtype voteType: VoteStub
-	func validate(_ votes: [voteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult
+	associatedtype VoteType: VoteStub
+	func validate(_ votes: [VoteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult
 	
 	/// The id of the validator
 	var id: String {get}
@@ -23,6 +23,5 @@ extension Validateable where Self: RawRepresentable, RawValue == String{
 	}
 }
 extension Validateable where Self: CaseIterable{
-	
-	public static var allValidators: [Self] {Array(self.allCases)}
+	public static var allValidators: [Self] { Array(self.allCases) }
 }

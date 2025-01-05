@@ -67,7 +67,7 @@ extension VoteProtocol{
         }
         
         // Finds the individual votes
-        let votes = valueLines.compactMap { val -> Self.voteType? in
+        let votes = valueLines.compactMap { val -> Self.VoteType? in
             let elements = val.split(separator: ",", omittingEmptySubsequences: false)
             // Checks that the expected number of values is available
             guard options.count == elements.count - config.preValues.count else {
@@ -94,14 +94,14 @@ extension VoteProtocol{
             }
             let constituent = Constituent(name: nil, identifier: String(constituentID), tag: constituentTag)
             let values = elements.dropFirst(config.preValues.count).map{$0.trimmingCharacters(in: .whitespaces)}
-            return Self.voteType.fromCSVLine(config: config, values: values, options: options, constituent: constituent)
+            return VoteType.fromCSVLine(config: config, values: values, options: options, constituent: constituent)
         }
         
         guard !errorFlag else {
             return nil
         }
         
-        return Self.init(options: options, constituents: Set(votes.map(\.constituent)), votes: votes)
+        return Self(options: options, constituents: Set(votes.map(\.constituent)), votes: votes)
     }
 }
 

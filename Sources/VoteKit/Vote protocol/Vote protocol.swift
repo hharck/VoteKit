@@ -1,7 +1,7 @@
 import Foundation
 public protocol VoteProtocol: Actor{
-	associatedtype voteType
-    associatedtype particularValidator: Validateable where particularValidator.voteType == Self.voteType
+	associatedtype VoteType
+    associatedtype ParticularValidator: Validateable where ParticularValidator.VoteType == Self.VoteType
 	/// A unique identifier for the vote
 	var id: UUID {get}
 	
@@ -15,16 +15,16 @@ public protocol VoteProtocol: Actor{
 	var constituents: Set<Constituent> {get set}
 	
 	/// The votes cast 
-	var votes: [voteType] {get set}
+	var votes: [VoteType] {get set}
 		
 	/// Extra data used by clients
 	var customData: [String: String] {get set}
 	  
 	func validateParticularValidators() -> [VoteValidationResult]
-	var particularValidators: [particularValidator] {get}
-	var genericValidators: [GenericValidator<voteType>] {get}
+	var particularValidators: [ParticularValidator] {get}
+	var genericValidators: [GenericValidator<VoteType>] {get}
 
-	init(options: [VoteOption], constituents: Set<Constituent>, votes: [voteType])
+	init(options: [VoteOption], constituents: Set<Constituent>, votes: [VoteType])
 	
 	static var typeName: String {get}
 }
