@@ -1,24 +1,25 @@
 import Foundation
-public actor YesNoVote: VoteProtocol{
+public actor YesNoVote: VoteProtocol, HasCustomValidators {
     public var id: UUID
     public var name: String
     public var options: [VoteOption]
     public var constituents: Set<Constituent>
     public var votes: [YesNoVoteType]
-    public var genericValidators: [GenericValidator<YesNoVoteType>] = []
-    public var particularValidators: [YesNoValidators] = []
     public var customData: [String : String] = [:]
+    public var genericValidators: [GenericValidator<YesNoVoteType>]
+    // FIXME: This is a constant as a workaround for https://github.com/swiftlang/swift/issues/78442 which occurs in `VoteProtocol.validate`
+    public let customValidators: [YesNoValidators]
     public static let typeName: String = "Yes-no"
     
-    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType] = [], genericValidators: [GenericValidator<YesNoVoteType>] = [], particularValidators: [YesNoValidators] = [], customData: [String : String] = [:]){
+    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType] = [], genericValidators: [GenericValidator<YesNoVoteType>] = [], customValidators: [YesNoValidators] = []){
         self.id = id
         self.name = name
         self.options = options
         self.constituents = constituents
         self.votes = votes
         self.genericValidators = genericValidators
-        self.particularValidators = particularValidators
         self.customData = customData
+        self.customValidators = customValidators
     }
     
     public init(options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType]) {
@@ -29,6 +30,7 @@ public actor YesNoVote: VoteProtocol{
         self.id = UUID()
         self.name = "Imported vote"
         self.genericValidators = []
+        self.customValidators = []
     }
     
     public struct YesNoVoteType: VoteStub{

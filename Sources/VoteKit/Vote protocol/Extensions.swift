@@ -1,16 +1,22 @@
-extension VoteProtocol{
-	public func validate() -> [VoteValidationResult]{
-		guard !votes.isEmpty else {
-			return [VoteValidationResult(name: "No votes cast", errors: [])]
-		}
+extension VoteProtocol {
+	public func validate() -> [VoteValidationResult] {
 		
-		return genericValidators
-			.map { validator in
-				validator.validate(votes, constituents, options)
-			}
-		+ self.validateParticularValidators()
-		+ GenericValidator<VoteType>.oneVotePerUser.validate(votes, constituents, options)
-		
+        var validators: [any Validateable<VoteType>] = genericValidators
+        
+        if let self = self as? (any HasCustomValidators<VoteType>) {
+            //validators += self.assumeIsolated { $0.customValidators }
+            // FIXME: Temporary workaround for https://github.com/swiftlang/swift/issues/78442
+            validators += self.customValidators
+        }
+        validators.append(AtLeastOneVote())
+        validators.append(OneVotePerUser())
+        var errors = validators.map { $0.validate(votes, constituents, options) }
+        if let self = (self as? (any HasManualValidation)) {
+            errors += self.assumeIsolated {
+                $0.doManualValidation()
+            }
+        }
+        return errors
     }
     
     public func validateThrowing() throws {
@@ -21,27 +27,14 @@ extension VoteProtocol{
             throw ValidationErrors(error: validationResults)
         }
     }
-
 }
 
 struct ValidationErrors: Error {
     var error: [VoteValidationResult]
 }
 
-extension VoteProtocol{
-	public func validateParticularValidators() -> [VoteValidationResult] {
-		particularValidators.map{ $0.validate(votes, constituents, options) }
-	}
-}
-
-
 //MARK: Getters
 extension VoteProtocol {
-	/// Retrieves customData for the given key
-	public func getData(key: String) async -> Codable?{
-		self.customData[key]
-	}
-	
 	/// Retrieves an array of options
 	public func getAllOptions() async -> [VoteOption]{
 		self.options
@@ -83,13 +76,6 @@ extension VoteProtocol{
 	/// Adds multiple  constituents
 	public func addConstituents(_ constituents: Set<Constituent>) async{
 		self.constituents.formUnion(constituents)
-	}
-}
-
-extension VoteProtocol{
-	//MARK: Custom data
-	public func setData(key: String, value: String?) async {
-		self.customData[key] = value
 	}
 }
 

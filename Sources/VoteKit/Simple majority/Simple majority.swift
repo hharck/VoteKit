@@ -1,38 +1,22 @@
 import Foundation
 public actor SimpleMajority: SingleWinnerVote {
-    public typealias particularValidator = SimpleMajorityValidators
-    
-    public enum SimpleMajorityValidators: CaseIterable, Validateable {
-        public func validate(_ votes: [SimpleMajority.SimpleMajorityVote], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult {
-            fatalError()
-        }
-        
-        public typealias VoteType = SimpleMajorityVote
-        
-        public var id: String { "" }
-        
-        public var name: String { "" }
-    }
-    
     public var id: UUID
     public var name: String
     public var options: [VoteOption]
     public var constituents: Set<Constituent>
     public var votes: [SimpleMajorityVote] = []
     public var genericValidators: [GenericValidator<SimpleMajorityVote>]
-    public var particularValidators: [SimpleMajorityValidators] = []
     public var customData: [String : String] = [:]
     public static let typeName: String = "Simple majority"
     
     
-    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [SimpleMajorityVote] = [], genericValidators: [GenericValidator<SimpleMajorityVote>], particularValidators: [SimpleMajorityValidators] = [], customData: [String : String] = [:]){
+    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [SimpleMajorityVote] = [], genericValidators: [GenericValidator<SimpleMajorityVote>]){
         self.id = id
         self.name = name
         self.options = options
         self.constituents = constituents
         self.votes = votes
         self.genericValidators = genericValidators
-        self.particularValidators = particularValidators
         self.customData = customData
     }
     
@@ -50,7 +34,7 @@ public actor SimpleMajority: SingleWinnerVote {
         public var constituent: Constituent
         public var preferredOption: VoteOption?
         
-        public var isBlank: Bool {preferredOption == nil}
+        public var isBlank: Bool { preferredOption == nil }
         
         public init(bareBonesVote constituent: Constituent) {
             self.constituent = constituent
@@ -69,8 +53,7 @@ extension SimpleMajority.SimpleMajorityVote{
         guard values.count == options.count else {
             return nil
         }
-        
-        
+
         var option: VoteOption?
         for i in 0..<values.count {
             let value = values[i]

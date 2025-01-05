@@ -1,6 +1,6 @@
 extension SimpleMajority{
 	func resetVoteForUser(_ id: ConstituentIdentifier) {
-		votes.removeAll{ $0.constituent.identifier == id }
+		votes.removeAll { $0.constituent.identifier == id }
 	}
 	
     public func count(force: Bool) async throws -> [VoteOption : UInt] {

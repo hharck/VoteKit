@@ -23,7 +23,7 @@ public struct GenericValidator<voteType: VoteStub>: Validateable{
 	public func validate(_ votes: [voteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult{
 		let offenders = closure(votes, constituents, allOptions)
 		let offenseTexts = offenders.map{offenseText($0, [])}
-		return VoteValidationResult(name: self.id, errors: offenseTexts)
+        return makeResult(errors: offenseTexts)
 	}
 
 	public init(id: String, name: String, offenseText: @escaping offenseClosureType, closure: @escaping closureType){
@@ -39,14 +39,7 @@ public struct GenericValidator<voteType: VoteStub>: Validateable{
 
 extension GenericValidator{
 	public static var allValidators: [GenericValidator<voteType>] {[.everyoneHasVoted, .noBlankVotes]}
-	/// Will not validate any constitutent voting multiple times
-	internal static var oneVotePerUser: GenericValidator {
-		GenericValidator(id: "OneVotePerUser", name: "One vote per. user", offenseText: {"\($0.constituent.identifier) voted multiple times"}) { votes, _, _   in
-			let nonUniques =  Set(votes.map(\.constituent.identifier).nonUniques())
-			return votes.filter{nonUniques.contains($0.constituent.identifier)}
-		}
-	}
-	
+
 	/// Will not validate untill everyone on the allowed voters list has votes
 	public static var everyoneHasVoted: GenericValidator {
 		GenericValidator(id: "EveryoneVoted", name: "All verified users are required to vote", offenseText: {"\($0.constituent.identifier) hasn't voted"}) { votes, constituents, _ in

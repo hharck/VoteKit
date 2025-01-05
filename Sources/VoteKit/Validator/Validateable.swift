@@ -1,4 +1,4 @@
-public protocol Validateable: Sendable, Equatable{
+public protocol Validateable<VoteType>: Sendable, Equatable{
 	associatedtype VoteType: VoteStub
 	func validate(_ votes: [VoteType], _ constituents: Set<Constituent>, _ allOptions: [VoteOption]) -> VoteValidationResult
 	
@@ -16,7 +16,6 @@ extension Validateable{
 		lhs.id == rhs.id
 	}
 }
-
 extension Validateable where Self: RawRepresentable, RawValue == String{
 	public var id: String {
 		return self.rawValue
