@@ -17,7 +17,7 @@ extension VoteProtocol{
         let validationResults = validate()
         
         // If any validation has en error, throw it
-        guard validationResults.hasErrors else {
+        guard !validationResults.hasErrors else {
             throw ValidationErrors(error: validationResults)
         }
     }
