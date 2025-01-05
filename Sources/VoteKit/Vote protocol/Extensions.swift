@@ -1,13 +1,7 @@
 extension VoteProtocol {
 	public func validate() -> [VoteValidationResult] {
 		
-        var validators: [any Validateable<VoteType>] = genericValidators
-        
-        if let self = self as? (any HasCustomValidators<VoteType>) {
-            //validators += self.assumeIsolated { $0.customValidators }
-            // FIXME: Temporary workaround for https://github.com/swiftlang/swift/issues/78442
-            validators += self.customValidators
-        }
+        var validators = allValidators
         validators.append(AtLeastOneVote())
         validators.append(OneVotePerUser())
         var errors = validators.map { $0.validate(votes, constituents, options) }

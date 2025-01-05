@@ -33,6 +33,18 @@ public protocol HasCustomValidators<VoteType>: VoteProtocol {
     nonisolated var customValidators: [CustomValidators] {get}
 }
 
+extension VoteProtocol {
+    public var allValidators: [any Validateable<VoteType>] {
+        var validators: [any Validateable<VoteType>] = genericValidators
+        if let self = self as? (any HasCustomValidators<VoteType>) {
+            //validators += self.assumeIsolated { $0.customValidators }
+         	// FIXME: Temporary workaround for https://github.com/swiftlang/swift/issues/78442
+            validators += self.customValidators
+        }
+        return validators
+    }
+}
+
 public protocol VoteStub: Codable, Sendable, Hashable{
 	/// The constituent who did cast this vote
 	var constituent: Constituent {get set}
