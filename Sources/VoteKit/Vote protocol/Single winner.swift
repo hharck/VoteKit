@@ -22,7 +22,7 @@ public enum WinnerWrapper: Sendable{
 		}
 	}
 	
-	///Anables input of any kind of sequence
+	/// Enables input of any kind of sequence
 	public init<T: Sequence>(_ sequence: T) where T.Element == VoteOption{
 		self.init(Set(sequence))
 	}

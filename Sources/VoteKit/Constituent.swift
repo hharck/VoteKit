@@ -1,16 +1,15 @@
 import Foundation
 public typealias ConstituentIdentifier = String
 
-
 /// The description of a voter in a vote
-public struct Constituent: Hashable, Codable, Sendable{
+public struct Constituent: Hashable, Codable, Sendable {
 	public var name: String?
 	public var identifier: ConstituentIdentifier
 	
 	public var tag: String?
 	public var email: String?
 	
-	public init(name: String? = nil, identifier: ConstituentIdentifier, tag: String? = nil, email: String? = nil){
+	public init(name: String? = nil, identifier: ConstituentIdentifier, tag: String? = nil, email: String? = nil) {
 		self.name = name
 		self.identifier = identifier
 		self.tag = tag
@@ -24,7 +23,7 @@ public struct Constituent: Hashable, Codable, Sendable{
 }
 
 // Primarily used for simply creating a constituent in tests
-extension Constituent: ExpressibleByStringLiteral{
+extension Constituent: ExpressibleByStringLiteral {
 	public init(stringLiteral value: ConstituentIdentifier){
 		self.init(identifier: value)
 	}

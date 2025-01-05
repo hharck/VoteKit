@@ -10,7 +10,6 @@ public actor YesNoVote: VoteProtocol{
     public var customData: [String : String] = [:]
     public static let typeName: String = "Yes-no"
     
-    
     public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType] = [], genericValidators: [GenericValidator<YesNoVoteType>] = [], particularValidators: [YesNoValidators] = [], customData: [String : String] = [:]){
         self.id = id
         self.name = name

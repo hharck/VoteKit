@@ -3,7 +3,6 @@ public struct GenericValidator<voteType: VoteStub>: Validateable{
 	public typealias closureType = @Sendable ([voteType], _ constituents: Set<Constituent>, _ options: [VoteOption]) -> [voteType]
 	public typealias offenseClosureType = @Sendable (_ for: voteType, _ options: [VoteOption]) -> String
 
-
 	/// The id of the validator
 	public let id: String
 
@@ -15,7 +14,6 @@ public struct GenericValidator<voteType: VoteStub>: Validateable{
 
 	/// Returns every vote in violation of the validator
 	private var closure: closureType
-
 
 	/// Validates the given votes
 	/// - Parameters:
@@ -38,7 +36,6 @@ public struct GenericValidator<voteType: VoteStub>: Validateable{
 		self.init(id: id, name: name, offenseText: {u, o in offenseText(u)}, closure: closure)
 	}
 }
-
 
 extension GenericValidator{
 	public static var allValidators: [GenericValidator<voteType>] {[.everyoneHasVoted, .noBlankVotes]}
