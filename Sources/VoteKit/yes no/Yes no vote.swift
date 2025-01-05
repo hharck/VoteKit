@@ -5,7 +5,6 @@ public actor YesNoVote: VoteProtocol, HasCustomValidators {
     public var options: [VoteOption]
     public var constituents: Set<Constituent>
     public var votes: [YesNoVoteType]
-    public var customData: [String : String] = [:]
     public var genericValidators: [GenericValidator<YesNoVoteType>]
     // FIXME: This is a constant as a workaround for https://github.com/swiftlang/swift/issues/78442 which occurs in `VoteProtocol.validate`
     public let customValidators: [YesNoValidators]
@@ -18,7 +17,6 @@ public actor YesNoVote: VoteProtocol, HasCustomValidators {
         self.constituents = constituents
         self.votes = votes
         self.genericValidators = genericValidators
-        self.customData = customData
         self.customValidators = customValidators
     }
     

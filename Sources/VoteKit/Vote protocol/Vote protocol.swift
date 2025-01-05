@@ -15,8 +15,6 @@ public protocol VoteProtocol: Actor {
 	
 	/// The votes cast 
 	var votes: [VoteType] {get set}
-	/// Extra data used by clients
-	var customData: [String: String] {get set}
     
 	var genericValidators: [GenericValidator<VoteType>] {get}
 

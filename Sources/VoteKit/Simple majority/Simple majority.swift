@@ -6,7 +6,6 @@ public actor SimpleMajority: SingleWinnerVote {
     public var constituents: Set<Constituent>
     public var votes: [SimpleMajorityVote] = []
     public var genericValidators: [GenericValidator<SimpleMajorityVote>]
-    public var customData: [String : String] = [:]
     public static let typeName: String = "Simple majority"
     
     
@@ -17,7 +16,6 @@ public actor SimpleMajority: SingleWinnerVote {
         self.constituents = constituents
         self.votes = votes
         self.genericValidators = genericValidators
-        self.customData = customData
     }
     
     public init(options: [VoteOption], constituents: Set<Constituent>, votes: [SimpleMajorityVote]) {
