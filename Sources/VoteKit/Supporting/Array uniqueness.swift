@@ -1,14 +1,13 @@
 extension Sequence where Element : Hashable {
 	/// Contains all the elements of an array that isn't unique
-	public func nonUniques() -> Set<Self.Element> {
-		var unique: Set<Self.Element> = []
+	public func nonUniques() -> Set<Element> {
+		var unique: Set<Element> = []
 		
-		return Set(self.compactMap{ element -> Self.Element? in
-			if unique.contains(element){
-				return element
+		return Set(self.compactMap{ element -> Element? in
+            if unique.insert(element).inserted {
+                return nil
 			} else {
-				unique.insert(element)
-				return nil
+                return element
 			}
 		})
 	}
