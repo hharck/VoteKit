@@ -24,7 +24,7 @@ extension VoteProtocol {
 }
 
 public struct VoteKitValidationErrors: Error {
-    var error: [VoteValidationResult]
+    public var error: [VoteValidationResult]
 }
 
 //MARK: Getters
