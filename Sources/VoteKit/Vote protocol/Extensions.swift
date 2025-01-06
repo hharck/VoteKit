@@ -18,12 +18,12 @@ extension VoteProtocol {
         
         // If any validation has en error, throw it
         guard !validationResults.hasErrors else {
-            throw ValidationErrors(error: validationResults)
+            throw VoteKitValidationErrors(error: validationResults)
         }
     }
 }
 
-struct ValidationErrors: Error {
+public struct VoteKitValidationErrors: Error {
     var error: [VoteValidationResult]
 }
 
