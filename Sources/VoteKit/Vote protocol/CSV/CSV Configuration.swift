@@ -149,35 +149,44 @@ public struct CSVConfiguration: Codable, Sendable{
     ///   - minimumBrackets: The minimum number of brackets expected
     ///   - maximumBrackets: The maximum number of brackets expected
     /// - Returns: The validity of the value
-    private static func isValid(values: String, allowsComma: Bool = false, minimumBrackets: Int = 0, maximumBrackets: Int? = nil) -> Bool{
-        if values.isEmpty{
+    private static func isValid(values: String, allowsComma: Bool = false, minimumBrackets: Int = 0, maximumBrackets: Int? = nil) -> Bool {
+        if values.isEmpty {
             return false
         }
-        
+
         // Check for invalid characters
-        if values.contains(";") || values.contains("\n") || values.contains("\r") || values.contains("\t"){
+        if values.contains(";") || values.contains("\n") || values.contains("\r") || values.contains("\t") {
             return false
         }
         if !allowsComma && values.contains(",") {
             return false
         }
-        
+
         // Check for non closed tags
-        let leftPattern = try! NSRegularExpression(pattern: "\\{")
-        let rightPattern = try! NSRegularExpression(pattern: "\\}")
-        
-        let leftCount = leftPattern.numberOfMatches(in: values, range: NSRange(values.startIndex..., in: values))
-        let rightCount = rightPattern.numberOfMatches(in: values, range: NSRange(values.startIndex..., in: values))
-        
-        guard leftCount == rightCount else {
+        var openCount = 0
+        var leftCount = 0
+        var rightCount = 0
+        for char in values {
+            switch char {
+            case "{":
+                openCount += 1
+                leftCount += 1
+            case "}":
+                guard openCount != 0 else { return false }
+                openCount -= 1
+                rightCount += 1
+            default: break
+            }
+        }
+        guard openCount == 0 else {
             return false
         }
-        
+
         // Checks that the number of brackets is within range, leftCount is only checked due to it being equal to rightCount above
         guard leftCount >= minimumBrackets && (maximumBrackets == nil || leftCount <= maximumBrackets!) else {
             return false
         }
-        
+
         return true
     }
 }
