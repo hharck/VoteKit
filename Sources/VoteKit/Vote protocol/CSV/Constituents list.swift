@@ -14,7 +14,7 @@ public enum HeaderValues: String {
     }
 }
 
-//MARK: Export
+// MARK: Export
 public typealias HeaderValueDictionary = [HeaderValues: String]
 public typealias SequenceOfHeadervalueDictionaries = Sequence<HeaderValueDictionary>
 
@@ -33,7 +33,7 @@ extension HeaderValueDictionary {
 }
 
 extension Constituent {
-    init(rowNo: Int?, headerValues: HeaderValueDictionary) throws {
+    init(rowNo: Int?, headerValues: HeaderValueDictionary) throws(DecodeConstituentError) {
         guard let identifier = headerValues[.identifier] else {
             throw DecodeConstituentError.invalidIdentifier.errorOnLine(rowNo)
         }
@@ -77,7 +77,7 @@ extension SequenceOfHeadervalueDictionaries {
                 csv += "\(name),"
             }
             csv += constituent[.identifier] ?? ""
-            if showTags{
+            if showTags {
                 csv += ",\(constituent[.tag] ?? "")"
             }
             if showEmails {
@@ -87,76 +87,69 @@ extension SequenceOfHeadervalueDictionaries {
         return csv
     }
 
-    public func getConstituents() throws -> [Constituent] {
-        try self.enumerated().map{ ($0 + 1, $1 )}.map(Constituent.init)
+    public func getConstituents() throws(DecodeConstituentError) -> [Constituent] {
+        try self.enumerated().map { ($0 + 1, $1 )}.map(Constituent.init)
     }
 }
 
 // Allows for the conversion of any kind of sequence containing constituents to be converted into csv
-extension Sequence where Element == Constituent{
+extension Sequence where Element == Constituent {
     /// Creates a string representation of a CSV file containing the name and userid for all constituents
     /// - Returns: A string containing a CSV representation of the constituents
-    public func toCSV(config: CSVConfiguration) -> String{
+    public func toCSV(config: CSVConfiguration) -> String {
         map(HeaderValueDictionary.init).toCSV(config: config)
     }
 }
 
-
 // MARK: Import
 
 /// Creates an array of constituents from a CSV file
-public func constituentDataListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws -> [HeaderValueDictionary] {
+public func constituentDataListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws(DecodeConstituentError) -> [HeaderValueDictionary] {
 	guard !file.contains(";"), !file.contains("\t") else {
 		throw DecodeConstituentError.invalidCSV
 	}
-	
+
     let individualConstituentLines = file.split(whereSeparator: \.isNewline)
-	
+
 	// There has to be a limit
 	if individualConstituentLines.count > 10_000 {
 		throw DecodeConstituentError.nameTooLong
 	}
-	
+
 	guard let header = individualConstituentLines.first else {
         throw DecodeConstituentError.lineError(error: .invalidHeader, line: 0)
     }
 
-    let headerValues: [HeaderValues] = try {
-        do {
-            let split = header.split(separator: ",").map(String.init)
-            let headerValues = split.compactMap(HeaderValues.init)
-            guard split.count == headerValues.count else {
-                throw DecodeConstituentError.invalidCSV
-            }
-            return headerValues
-        } catch {
-            if let config, let customHeader = config.specialKeys.constituentsExportHeader, header == customHeader  {
-
-                var vals: [HeaderValues] = []
-                if !config.specialKeys.constituentsExportHideNames {
-                    vals.append(.name)
-                }
-                vals.append(.identifier)
-                if config.specialKeys.constituentsExportShowTags {
-                    vals.append(.tag)
-                }
-                if !config.specialKeys.constituentsExportHideEmails {
-                    vals.append(.email)
-                }
-                return vals
-            } else {
-                if let error = error as? DecodeConstituentError {
-                    throw error.errorOnLine(0)
-                } else {
-                    throw error
-                }
-            }
+    let headerValues: [HeaderValues]
+    do throws(DecodeConstituentError) {
+        let split = header.split(separator: ",").map(String.init)
+        let potentialHeaderValues = split.compactMap(HeaderValues.init)
+        guard split.count == potentialHeaderValues.count else {
+            throw DecodeConstituentError.invalidCSV
         }
-    }()
+        headerValues = potentialHeaderValues
+    } catch {
+        if let config, let customHeader = config.specialKeys.constituentsExportHeader, header == customHeader {
+            var vals: [HeaderValues] = []
+            if !config.specialKeys.constituentsExportHideNames {
+                vals.append(.name)
+            }
+            vals.append(.identifier)
+            if config.specialKeys.constituentsExportShowTags {
+                vals.append(.tag)
+            }
+            if !config.specialKeys.constituentsExportHideEmails {
+                vals.append(.email)
+            }
+            headerValues = vals
+        } else {
+            throw error.errorOnLine(0)
+        }
+    }
 
-    return try individualConstituentLines.dropFirst().enumerated().map{ index, row -> [HeaderValues: String] in
+    return try individualConstituentLines.dropFirst().enumerated().map { index, row throws(DecodeConstituentError) -> [HeaderValues: String] in
         let rowNo = index + 1
-		let row = row.split(separator:",", omittingEmptySubsequences: false)
+		let row = row.split(separator: ",", omittingEmptySubsequences: false)
 		guard row.count == headerValues.count else {
             throw DecodeConstituentError.invalidCSV.errorOnLine(rowNo)
 		}
@@ -184,12 +177,12 @@ public func constituentDataListFromCSV(file: String, config: CSVConfiguration? =
 	}
 }
 
-public func constituentsListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws -> [Constituent] {
+public func constituentsListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws(DecodeConstituentError) -> [Constituent] {
     try constituentDataListFromCSV(file: file, config: config, maxNameLength: maxNameLength).getConstituents()
 }
 
 // MARK: Error type
-public indirect enum DecodeConstituentError: Error{
+public indirect enum DecodeConstituentError: Error {
 	case invalidIdentifier, nameTooLong, invalidCSV, invalidHeader, invalidTag, invalidEmail
     case lineError(error: DecodeConstituentError, line: Int)
     func errorOnLine(_ line: Int?) -> Self {
