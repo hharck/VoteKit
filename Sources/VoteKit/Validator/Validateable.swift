@@ -21,6 +21,6 @@ extension Validateable where Self: RawRepresentable, RawValue == String{
 		return self.rawValue
 	}
 }
-extension Validateable where Self: CaseIterable{
+extension Validateable where Self: CaseIterable {
 	public static var allValidators: [Self] { Array(self.allCases) }
 }

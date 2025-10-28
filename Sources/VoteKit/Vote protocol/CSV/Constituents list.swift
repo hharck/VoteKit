@@ -33,7 +33,7 @@ extension HeaderValueDictionary {
 }
 
 extension Constituent {
-    init(rowNo: Int?, headerValues: HeaderValueDictionary) throws {
+    init(rowNo: Int?, headerValues: HeaderValueDictionary) throws(DecodeConstituentError) {
         guard let identifier = headerValues[.identifier] else {
             throw DecodeConstituentError.invalidIdentifier.errorOnLine(rowNo)
         }
@@ -87,7 +87,7 @@ extension SequenceOfHeadervalueDictionaries {
         return csv
     }
 
-    public func getConstituents() throws -> [Constituent] {
+    public func getConstituents() throws(DecodeConstituentError) -> [Constituent] {
         try self.enumerated().map{ ($0 + 1, $1 )}.map(Constituent.init)
     }
 }
@@ -105,7 +105,7 @@ extension Sequence where Element == Constituent{
 // MARK: Import
 
 /// Creates an array of constituents from a CSV file
-public func constituentDataListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws -> [HeaderValueDictionary] {
+public func constituentDataListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws(DecodeConstituentError) -> [HeaderValueDictionary] {
 	guard !file.contains(";"), !file.contains("\t") else {
 		throw DecodeConstituentError.invalidCSV
 	}
@@ -121,40 +121,35 @@ public func constituentDataListFromCSV(file: String, config: CSVConfiguration? =
         throw DecodeConstituentError.lineError(error: .invalidHeader, line: 0)
     }
 
-    let headerValues: [HeaderValues] = try {
-        do {
-            let split = header.split(separator: ",").map(String.init)
-            let headerValues = split.compactMap(HeaderValues.init)
-            guard split.count == headerValues.count else {
-                throw DecodeConstituentError.invalidCSV
-            }
-            return headerValues
-        } catch {
-            if let config, let customHeader = config.specialKeys.constituentsExportHeader, header == customHeader  {
-
-                var vals: [HeaderValues] = []
-                if !config.specialKeys.constituentsExportHideNames {
-                    vals.append(.name)
-                }
-                vals.append(.identifier)
-                if config.specialKeys.constituentsExportShowTags {
-                    vals.append(.tag)
-                }
-                if !config.specialKeys.constituentsExportHideEmails {
-                    vals.append(.email)
-                }
-                return vals
-            } else {
-                if let error = error as? DecodeConstituentError {
-                    throw error.errorOnLine(0)
-                } else {
-                    throw error
-                }
-            }
+    let headerValues: [HeaderValues]
+    do throws(DecodeConstituentError) {
+        let split = header.split(separator: ",").map(String.init)
+        let potentialHeaderValues = split.compactMap(HeaderValues.init)
+        guard split.count == potentialHeaderValues.count else {
+            throw DecodeConstituentError.invalidCSV
         }
-    }()
+        headerValues = potentialHeaderValues
+    } catch {
+        if let config, let customHeader = config.specialKeys.constituentsExportHeader, header == customHeader  {
+            var vals: [HeaderValues] = []
+            if !config.specialKeys.constituentsExportHideNames {
+                vals.append(.name)
+            }
+            vals.append(.identifier)
+            if config.specialKeys.constituentsExportShowTags {
+                vals.append(.tag)
+            }
+            if !config.specialKeys.constituentsExportHideEmails {
+                vals.append(.email)
+            }
+            headerValues = vals
+        } else {
+            throw error.errorOnLine(0)
+        }
+    }
+    
 
-    return try individualConstituentLines.dropFirst().enumerated().map{ index, row -> [HeaderValues: String] in
+    return try individualConstituentLines.dropFirst().enumerated().map{ index, row throws(DecodeConstituentError) -> [HeaderValues: String] in
         let rowNo = index + 1
 		let row = row.split(separator:",", omittingEmptySubsequences: false)
 		guard row.count == headerValues.count else {
@@ -184,7 +179,7 @@ public func constituentDataListFromCSV(file: String, config: CSVConfiguration? =
 	}
 }
 
-public func constituentsListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws -> [Constituent] {
+public func constituentsListFromCSV(file: String, config: CSVConfiguration? = nil, maxNameLength: Int) throws(DecodeConstituentError) -> [Constituent] {
     try constituentDataListFromCSV(file: file, config: config, maxNameLength: maxNameLength).getConstituents()
 }
 

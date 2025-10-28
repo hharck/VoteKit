@@ -10,7 +10,7 @@ public actor YesNoVote: VoteProtocol, HasCustomValidators {
     public let customValidators: [YesNoValidators]
     public static let typeName: String = "Yes-no"
     
-    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType] = [], genericValidators: [GenericValidator<YesNoVoteType>] = [], customValidators: [YesNoValidators] = []){
+    public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [YesNoVoteType] = [], genericValidators: [GenericValidator<YesNoVoteType>] = [], customValidators: [YesNoValidators] = []) {
         self.id = id
         self.name = name
         self.options = options
@@ -48,7 +48,7 @@ public actor YesNoVote: VoteProtocol, HasCustomValidators {
         }
     }
     
-    public func count(force: Bool) async throws -> [VoteOption : (yes: UInt, no: UInt, blank: UInt)]{
+    public func count(force: Bool) async throws(VoteKitValidationErrors) -> [VoteOption : (yes: UInt, no: UInt, blank: UInt)]{
         // Checks that all votes are valid
         if !force{
             try self.validateThrowing()

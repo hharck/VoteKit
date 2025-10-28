@@ -38,7 +38,7 @@ public struct CSVConfiguration: Codable, Sendable{
     
     public let specialKeys: SpecialKeys
     
-    public init(name: String, preHeaders: [String], preValues: [String], optionHeader: String, specialKeys: SpecialKeys = .empty) throws{
+    public init(name: String, preHeaders: [String], preValues: [String], optionHeader: String, specialKeys: SpecialKeys = .empty) throws(CSVConfigurationError) {
         self.name = name
         // Validates input
         guard preHeaders.count == preValues.count else {
@@ -68,7 +68,9 @@ public struct CSVConfiguration: Codable, Sendable{
 
             let expectedCommaCount = (specialKeys.constituentsExportHideNames ? 0 : 1) + (specialKeys.constituentsExportHideEmails ? 0 : 1) + (specialKeys.constituentsExportShowTags ? 1 : 0)
             if expectedCommaCount == 0 {
-                guard firstCommaIndex == nil else { throw CSVConfigurationError.invalidSpecialKey }
+                guard firstCommaIndex == nil else {
+                    throw CSVConfigurationError.invalidSpecialKey
+                }
             } else if let firstCommaIndex = firstCommaIndex {
                 // The correct number of fields and the commas should not be in the end of the string
                 guard let lastCommaIndex = ceh.lastIndex(of: ","),
@@ -191,7 +193,7 @@ public struct CSVConfiguration: Codable, Sendable{
     }
 }
 
-fileprivate enum CSVConfigurationError: String, Error{
+public enum CSVConfigurationError: String, Error{
     case invalidPreHeaders = "The pre headers are invalid"
     case invalidPreValues = "The pre values are invalid"
     case invalidOptionHeader = "The option header is invalid"
