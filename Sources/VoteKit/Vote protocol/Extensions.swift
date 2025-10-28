@@ -1,23 +1,24 @@
 extension VoteProtocol {
 	public func validate() -> [VoteValidationResult] {
 		
-        var validators = allValidators
-        validators.append(AtLeastOneVote())
-        validators.append(OneVotePerUser())
+        let validators = allValidators
+        + [
+            AtLeastOneVote(),
+            OneVotePerUser(),
+        ]
         var errors = validators.map { $0.validate(votes, constituents, options) }
-        if let self = (self as? (any HasManualValidation)) {
-            errors += self.assumeIsolated {
-                $0.doManualValidation()
-            }
+        
+        if let self = self as? any HasManualValidation {
+            errors += self.assumeIsolated { $0.doManualValidation() }
         }
         return errors
     }
     
-    public func validateThrowing() throws {
+    public func validateThrowing() throws(VoteKitValidationErrors) {
         let validationResults = validate()
         
         // If any validation has en error, throw it
-        guard !validationResults.hasErrors else {
+        if validationResults.hasErrors {
             throw VoteKitValidationErrors(error: validationResults)
         }
     }
