@@ -1,6 +1,8 @@
 public protocol SingleWinnerVote: VoteProtocol {
-	func findWinner(force: Bool, excluding: Set<VoteOption>) async throws(VoteKitValidationErrors) -> WinnerWrapper
-    func count(force: Bool) async throws(VoteKitValidationErrors) -> [VoteOption: UInt]
+    associatedtype ErrorType: Error = VoteKitValidationErrors
+    
+    func findWinner(force: Bool, excluding: Set<VoteOption>) async throws(ErrorType) -> WinnerWrapper
+    func count(force: Bool) async throws(ErrorType) -> [VoteOption: UInt]
 }
 
 extension SingleWinnerVote {
