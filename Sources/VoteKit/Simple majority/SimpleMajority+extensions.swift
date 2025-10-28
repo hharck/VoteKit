@@ -2,10 +2,10 @@ extension SimpleMajority{
 	func resetVoteForUser(_ id: ConstituentIdentifier) {
 		votes.removeAll { $0.constituent.identifier == id }
 	}
-	
+
     public func count(force: Bool) async throws -> [VoteOption : UInt] {
         // Checks that all votes are valid
-        if !force{
+        if !force {
             try self.validateThrowing()
         }
         

@@ -8,7 +8,6 @@ public actor SimpleMajority: SingleWinnerVote {
     public var genericValidators: [GenericValidator<SimpleMajorityVote>]
     public static let typeName: String = "Simple majority"
     
-    
     public init(id: UUID = UUID(), name: String, options: [VoteOption], constituents: Set<Constituent>, votes: [SimpleMajorityVote] = [], genericValidators: [GenericValidator<SimpleMajorityVote>]){
         self.id = id
         self.name = name

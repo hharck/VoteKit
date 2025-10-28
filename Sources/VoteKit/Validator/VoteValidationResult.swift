@@ -19,6 +19,6 @@ extension Validateable {
 
 extension Array where Element == VoteValidationResult {
 	public var hasErrors: Bool {
-        contains { !$0.errors.isEmpty }
+        !allSatisfy(\.errors.isEmpty)
 	}
 }

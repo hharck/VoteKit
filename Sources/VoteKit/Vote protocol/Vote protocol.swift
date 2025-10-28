@@ -30,7 +30,7 @@ public protocol HasManualValidation: VoteProtocol {
 public protocol HasCustomValidators<VoteType>: VoteProtocol {
     associatedtype CustomValidators: Validateable<VoteType>
     // FIXME: `nonisolated` as a workaround for https://github.com/swiftlang/swift/issues/78442 which occurs in `VoteProtocol.validate`
-    nonisolated var customValidators: [CustomValidators] {get}
+    nonisolated var customValidators: [CustomValidators] { get }
 }
 
 extension VoteProtocol {
