@@ -1,7 +1,7 @@
-extension SimpleMajority{
-	func resetVoteForUser(_ id: ConstituentIdentifier) {
-		votes.removeAll { $0.constituent.identifier == id }
-	}
+extension SimpleMajority {
+    func resetVoteForUser(_ id: ConstituentIdentifier) {
+        votes.removeAll { $0.constituent.identifier == id }
+    }
 
     public func count(force: Bool) async throws(VoteKitValidationErrors) -> [VoteOption: UInt] {
         // Checks that all votes are valid
@@ -32,7 +32,7 @@ extension SimpleMajority {
     public func findWinner(force: Bool, excluding: Set<VoteOption>) async throws(VoteKitValidationErrors) -> WinnerWrapper {
         let counted = try await self.count(force: force)
         let highestCount = counted.values.max()
-        let winner = counted.filter{ $0.value == highestCount }.map(\.key)
+        let winner = counted.filter { $0.value == highestCount }.map(\.key)
         return WinnerWrapper(winner)
     }
 }

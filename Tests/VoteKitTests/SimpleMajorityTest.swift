@@ -11,9 +11,9 @@ struct SimpleMajorityTest {
             constituents: [],
             votes: [.init(constituent: constituents[0], preferredOption: options[0])]
         )
-        
+
         await #expect(throws: Never.self, performing: { try await correctVote.validateThrowing() })
-        
+
         let voteWithUnknownOption = SimpleMajority(
             options: ["a", "b", "c"],
             constituents: [],

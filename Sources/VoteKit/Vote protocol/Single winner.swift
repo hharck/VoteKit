@@ -1,32 +1,32 @@
-public protocol SingleWinnerVote: VoteProtocol{
+public protocol SingleWinnerVote: VoteProtocol {
 	func findWinner(force: Bool, excluding: Set<VoteOption>) async throws(VoteKitValidationErrors) -> WinnerWrapper
-    func count(force: Bool) async throws(VoteKitValidationErrors) -> [VoteOption : UInt]
+    func count(force: Bool) async throws(VoteKitValidationErrors) -> [VoteOption: UInt]
 }
 
-extension SingleWinnerVote{
+extension SingleWinnerVote {
 	func count(force: Bool, excluding: Set<VoteOption>) async throws -> [VoteOption: UInt] {
 		try await self.count(force: force)
 	}
 }
 
-public enum WinnerWrapper: Sendable{
+public enum WinnerWrapper: Sendable {
 	case singleWinner(winner: VoteOption)
 	case tie(winners: Set<VoteOption>)
-	
-	public init(_ set: Set<VoteOption>){
-		if set.count == 1{
+
+	public init(_ set: Set<VoteOption>) {
+		if set.count == 1 {
 			self = .singleWinner(winner: set.first!)
 		} else {
 			self = .tie(winners: set)
 		}
 	}
-	
+
 	/// Enables input of any kind of sequence
-	public init<T: Sequence>(_ sequence: T) where T.Element == VoteOption{
+	public init<T: Sequence>(_ sequence: T) where T.Element == VoteOption {
 		self.init(Set(sequence))
 	}
-	
-	public func winners() -> Set<VoteOption>{
+
+	public func winners() -> Set<VoteOption> {
 		switch self {
 		case .singleWinner(let winner):
 			return [winner]

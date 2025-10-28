@@ -5,10 +5,10 @@ public struct VoteValidationResult: Codable, Hashable, Sendable {
 	}
 	/// The name of the validator responsible for giving this set of errors
 	public let name: String
-	
+
 	/// The errors found during validation of a single validation rule
 	public let errors: [String]
-	
+
 }
 
 extension Validateable {
