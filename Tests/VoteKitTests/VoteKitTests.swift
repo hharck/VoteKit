@@ -1,8 +1,10 @@
-import XCTest
+import Testing
 @testable import VoteKit
 
-final class VoteKitTests: XCTestCase {
-    func testCreationOfCSVConfigs() throws {
+@Suite
+struct CSVTesting {
+    @Test
+    func creationOfCSVConfigs() throws {
         let _: [CSVConfiguration] = [.defaultConfiguration(), .SMKid(), .defaultWithTags(), .onlyIds()]
     }
 }
